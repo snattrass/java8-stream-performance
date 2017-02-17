@@ -1,7 +1,6 @@
 package io.nattrass;
 
 import java.util.Arrays;
-import java.util.OptionalInt;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 

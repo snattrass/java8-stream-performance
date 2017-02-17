@@ -1,7 +1,5 @@
 package io.nattrass;
 
-import org.openjdk.jmh.annotations.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,9 +8,20 @@ import java.util.OptionalInt;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-@Fork(value = 1)
-@Warmup(iterations = 5, time = 3, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 5, time = 3, timeUnit = TimeUnit.SECONDS)
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
+
+@Fork(value = 2)
+@Warmup(iterations = 5, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, timeUnit = TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Thread)
