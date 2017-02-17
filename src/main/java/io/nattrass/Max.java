@@ -5,6 +5,8 @@ import org.openjdk.jmh.annotations.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -56,13 +58,20 @@ public class Max {
   }
 
   @Benchmark
-  public int intArray_stream () {
-    return Arrays.stream(intArray).max().getAsInt();
+  public int intArray_lambda () {
+    return Arrays.stream(intArray).reduce(Integer.MIN_VALUE, (a, b) -> Math.max(a, b));
   }
 
   @Benchmark
-  public int intArray_lambda () {
-    return Arrays.stream(intArray).reduce(Integer.MIN_VALUE, Integer::max);
+  public int intArray_stream () {
+    OptionalInt intOptional =  Arrays.stream(intArray).max();
+    return intOptional.getAsInt();
+  }
+
+  @Benchmark
+  public int intArray_parallelStream () {
+    OptionalInt intOptional =  Arrays.stream(intArray).parallel().max();
+    return intOptional.getAsInt();
   }
 
   // Integer[]
@@ -92,24 +101,23 @@ public class Max {
   }
 
   @Benchmark
-  public int integerArray_stream () {
-    return Arrays.stream(integerArray).mapToInt(Integer::intValue).max().getAsInt();
+  public int integerArray_lambda () {
+    return Arrays.stream(integerArray).reduce(Integer.MIN_VALUE, (a, b) -> Math.max(a, b));
   }
 
+  @Benchmark
+  public int integerArray_stream () {
+    Optional<Integer> integerOptional =  Arrays.stream(integerArray).reduce(Integer::max);
+    return integerOptional.get();
+  }
+
+  @Benchmark
+  public int integerArray_parallelStream () {
+    Optional<Integer> integerOptional =  Arrays.stream(integerArray).parallel().reduce(Integer::max);
+    return integerOptional.get();
+  }
 
   // List<Integer>
-
-  // @Benchmark
-  // public int list_max_for() {
-  // int max = Integer.MIN_VALUE;
-  // for (int i = 0; i < listOfRandomIntegers().length; i++) {
-  // if(intArray[i] > max) {
-  // max = intArray[i];
-  // }
-  // }
-  //
-  // return max;
-  // }
 
   @Benchmark
   public int list_forEach () {
@@ -124,8 +132,20 @@ public class Max {
   }
 
   @Benchmark
+  public int list_lambda () {
+    return integerList.stream().reduce(Integer.MIN_VALUE, (a, b) -> Math.max(a, b));
+  }
+
+  @Benchmark
   public int list_stream () {
-    return integerList.stream().mapToInt(Integer::intValue).max().getAsInt();
+    Optional<Integer> integerOptional = integerList.stream().reduce(Integer::max);
+    return integerOptional.get();
+  }
+
+  @Benchmark
+  public int list_parallelStream () {
+    Optional<Integer> integerOptional =  integerList.stream().parallel().reduce(Integer::max);
+    return integerOptional.get();
   }
 
   private static Integer[] arrayOfRandomIntegers () {
