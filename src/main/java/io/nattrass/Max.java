@@ -20,14 +20,14 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
 @Fork(value = 2)
-@Warmup(iterations = 5, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 5, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 10, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 10, timeUnit = TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Thread)
 public class Max {
 
-  private static final int NUMBER_OF_ELEMENTS = 500_000;
+  private static final int NUMBER_OF_ELEMENTS = 1_000_000;
 
   private static int[] intArray;
   private static Integer[] integerArray;
@@ -86,10 +86,10 @@ public class Max {
   // Integer[]
 
   @Benchmark
-  public int integerArray_for () {
-    int max = Integer.MIN_VALUE;
+  public Integer integerArray_for () {
+    Integer max = Integer.MIN_VALUE;
     for (int i = 0; i < integerArray.length; i++) {
-      if (integerArray[i] > max) {
+      if (integerArray[i].intValue() > max.intValue()) {
         max = integerArray[i];
       }
     }
@@ -98,10 +98,10 @@ public class Max {
   }
 
   @Benchmark
-  public int integerArray_forEach () {
-    int max = Integer.MIN_VALUE;
-    for (int value : integerArray) {
-      if (value > max) {
+  public Integer integerArray_forEach () {
+    Integer max = Integer.MIN_VALUE;
+    for (Integer value : integerArray) {
+      if (value.intValue() > max.intValue()) {
         max = value;
       }
     }
@@ -110,29 +110,29 @@ public class Max {
   }
 
   @Benchmark
-  public int integerArray_lambda () {
-    return Arrays.stream(integerArray).reduce(Integer.MIN_VALUE, (a, b) -> Math.max(a, b));
+  public Integer integerArray_lambda () {
+    return Arrays.stream(integerArray).reduce(Integer.MIN_VALUE, (a, b) -> a > b ? a : b); // avoid unboxing
   }
 
   @Benchmark
-  public int integerArray_stream () {
-    Optional<Integer> integerOptional =  Arrays.stream(integerArray).reduce(Integer::max);
+  public Integer integerArray_stream () {
+    Optional<Integer> integerOptional =  Arrays.stream(integerArray).reduce(this::max);
     return integerOptional.get();
   }
 
   @Benchmark
-  public int integerArray_parallelStream () {
-    Optional<Integer> integerOptional =  Arrays.stream(integerArray).parallel().reduce(Integer::max);
+  public Integer integerArray_parallelStream () {
+    Optional<Integer> integerOptional =  Arrays.stream(integerArray).parallel().reduce(this::max);
     return integerOptional.get();
   }
 
   // List<Integer>
 
   @Benchmark
-  public int list_forEach () {
-    int max = Integer.MIN_VALUE;
+  public Integer list_forEach () {
+    Integer max = Integer.MIN_VALUE;
     for (Integer value : integerList) {
-      if (value > max) {
+      if (value.intValue() > max.intValue()) {
         max = value;
       }
     }
@@ -141,19 +141,19 @@ public class Max {
   }
 
   @Benchmark
-  public int list_lambda () {
-    return integerList.stream().reduce(Integer.MIN_VALUE, (a, b) -> Math.max(a, b));
+  public Integer list_lambda () {
+    return integerList.stream().reduce(Integer.MIN_VALUE, (a, b) -> a > b ? a : b); // avoid unboxing
   }
 
   @Benchmark
-  public int list_stream () {
-    Optional<Integer> integerOptional = integerList.stream().reduce(Integer::max);
+  public Integer list_stream () {
+    Optional<Integer> integerOptional = integerList.stream().reduce(this::max);
     return integerOptional.get();
   }
 
   @Benchmark
-  public int list_parallelStream () {
-    Optional<Integer> integerOptional =  integerList.stream().parallel().reduce(Integer::max);
+  public Integer list_parallelStream () {
+    Optional<Integer> integerOptional =  integerList.stream().parallel().reduce(this::max);
     return integerOptional.get();
   }
 
@@ -166,5 +166,10 @@ public class Max {
     }
 
     return array;
+  }
+
+  // Helper function to avoid the unboxing of Integer.max
+  private Integer max (Integer a, Integer b) {
+      return a.intValue() > b.intValue() ? a : b;
   }
 }
