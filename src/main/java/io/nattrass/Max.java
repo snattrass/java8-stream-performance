@@ -46,9 +46,7 @@ public class Max {
   public int intArray_for () {
     int max = Integer.MIN_VALUE;
     for (int i = 0; i < intArray.length; i++) {
-      if (intArray[i] > max) {
-        max = intArray[i];
-      }
+      max = Math.max(max, intArray[i]);
     }
 
     return max;
@@ -58,9 +56,7 @@ public class Max {
   public int intArray_forEach () {
     int max = Integer.MIN_VALUE;
     for (int value : intArray) {
-      if (value > max) {
-        max = value;
-      }
+      max = Math.max(max, value);
     }
 
     return max;
@@ -73,13 +69,13 @@ public class Max {
 
   @Benchmark
   public int intArray_stream () {
-    OptionalInt intOptional =  Arrays.stream(intArray).max();
+    OptionalInt intOptional =  Arrays.stream(intArray).reduce(Math::max);
     return intOptional.getAsInt();
   }
 
   @Benchmark
   public int intArray_parallelStream () {
-    OptionalInt intOptional =  Arrays.stream(intArray).parallel().max();
+    OptionalInt intOptional =  Arrays.stream(intArray).parallel().reduce(Math::max);
     return intOptional.getAsInt();
   }
 
@@ -89,9 +85,7 @@ public class Max {
   public Integer integerArray_for () {
     Integer max = Integer.MIN_VALUE;
     for (int i = 0; i < integerArray.length; i++) {
-      if (integerArray[i].intValue() > max.intValue()) {
-        max = integerArray[i];
-      }
+      max = this.integerMax(max, integerArray[i]);
     }
 
     return max;
@@ -101,9 +95,7 @@ public class Max {
   public Integer integerArray_forEach () {
     Integer max = Integer.MIN_VALUE;
     for (Integer value : integerArray) {
-      if (value.intValue() > max.intValue()) {
-        max = value;
-      }
+      max = this.integerMax(max, value);
     }
 
     return max;
@@ -111,18 +103,18 @@ public class Max {
 
   @Benchmark
   public Integer integerArray_lambda () {
-    return Arrays.stream(integerArray).reduce(Integer.MIN_VALUE, (a, b) -> a > b ? a : b); // avoid unboxing
+    return Arrays.stream(integerArray).reduce(Integer.MIN_VALUE, (a, b) -> integerMax(a, b));
   }
 
   @Benchmark
   public Integer integerArray_stream () {
-    Optional<Integer> integerOptional =  Arrays.stream(integerArray).reduce(this::max);
+    Optional<Integer> integerOptional = Arrays.stream(integerArray).reduce(this::integerMax);
     return integerOptional.get();
   }
 
   @Benchmark
   public Integer integerArray_parallelStream () {
-    Optional<Integer> integerOptional =  Arrays.stream(integerArray).parallel().reduce(this::max);
+    Optional<Integer> integerOptional =  Arrays.stream(integerArray).parallel().reduce(this::integerMax);
     return integerOptional.get();
   }
 
@@ -132,9 +124,7 @@ public class Max {
   public Integer list_forEach () {
     Integer max = Integer.MIN_VALUE;
     for (Integer value : integerList) {
-      if (value.intValue() > max.intValue()) {
-        max = value;
-      }
+      max = integerMax(max, value);
     }
 
     return max;
@@ -142,18 +132,18 @@ public class Max {
 
   @Benchmark
   public Integer list_lambda () {
-    return integerList.stream().reduce(Integer.MIN_VALUE, (a, b) -> a > b ? a : b); // avoid unboxing
+    return integerList.stream().reduce(Integer.MIN_VALUE, (a, b) -> integerMax(a, b)); // avoid unboxing
   }
 
   @Benchmark
   public Integer list_stream () {
-    Optional<Integer> integerOptional = integerList.stream().reduce(this::max);
+    Optional<Integer> integerOptional = integerList.stream().reduce(this::integerMax);
     return integerOptional.get();
   }
 
   @Benchmark
   public Integer list_parallelStream () {
-    Optional<Integer> integerOptional =  integerList.stream().parallel().reduce(this::max);
+    Optional<Integer> integerOptional =  integerList.stream().parallel().reduce(this::integerMax);
     return integerOptional.get();
   }
 
@@ -168,8 +158,8 @@ public class Max {
     return array;
   }
 
-  // Helper function to avoid the unboxing of Integer.max
-  private Integer max (Integer a, Integer b) {
+  // Helper function to avoid the unboxing of Integer.integerMax
+  private Integer integerMax(Integer a, Integer b) {
       return a.intValue() > b.intValue() ? a : b;
   }
 }
