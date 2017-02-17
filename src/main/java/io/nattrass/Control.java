@@ -1,6 +1,7 @@
 package io.nattrass;
 
 import java.util.Arrays;
+import java.util.OptionalInt;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -16,9 +17,9 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
-@Fork(value = 1)
-@Warmup(iterations = 5, time = 3, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 5, time = 3, timeUnit = TimeUnit.SECONDS)
+@Fork(value = 2)
+@Warmup(iterations = 5, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, timeUnit = TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Thread)
@@ -46,10 +47,19 @@ public class Control {
         hole.consume(intValue);
       }
     }
+    @Benchmark
+    public void array_lambda (Blackhole hole) {
+        Arrays.stream(intArray).forEach(value -> hole.consume(value));
+    }
 
     @Benchmark
-    public void array_stream(Blackhole hole) {
-      Arrays.stream(intArray).forEach(hole::consume);
+    public void array_stream (Blackhole hole) {
+        Arrays.stream(intArray).forEach(hole::consume);
+    }
+
+    @Benchmark
+    public void array_parallelStream (Blackhole hole) {
+        Arrays.stream(intArray).parallel().forEach(hole::consume);
     }
 
     private static int[] initializeArrayOfRandomInts() {
