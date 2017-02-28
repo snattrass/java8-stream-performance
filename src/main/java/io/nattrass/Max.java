@@ -158,7 +158,7 @@ public class Max {
     return array;
   }
 
-  // Helper function to avoid the unboxing of Integer.integerMax
+  // helper function to avoid the unboxing
   private Integer integerMax(Integer a, Integer b) {
       return a.intValue() > b.intValue() ? a : b;
   }
