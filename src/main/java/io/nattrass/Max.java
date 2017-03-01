@@ -126,7 +126,7 @@ public class Max {
 
   @Benchmark
   public Integer list_lambda () {
-    return randomIntegerList.stream().reduce(0, (a, b) -> integerMax(a, b)); // avoid unboxing
+    return randomIntegerList.stream().reduce(0, (a, b) -> integerMax(a, b));
   }
 
   @Benchmark
@@ -150,8 +150,8 @@ public class Max {
     return array;
   }
 
-  // helper function to avoid the unboxing
+  // helper function to avoid auto-boxing.  We're still unboxing (which we can't avoid) but it's explicitly done
   private Integer integerMax(Integer a, Integer b) {
-      return a.intValue() > b.intValue() ? a : b;
+    return a.intValue() > b.intValue() ? a : b;
   }
 }
