@@ -140,14 +140,11 @@ public class Max {
   }
 
   private static Integer[] generateArrayOfRandomPositiveIntegers () {
-    int min = 0;
-    int max = Integer.MAX_VALUE;
-
     Random random = new Random();
     Integer[] array = new Integer[NUMBER_OF_ELEMENTS];
 
     for (int i = 0; i < NUMBER_OF_ELEMENTS; i++) {
-      array[i] = random.nextInt((max - min) + 1) + min;
+      array[i] = random.nextInt(Integer.MAX_VALUE);
     }
 
     return array;
