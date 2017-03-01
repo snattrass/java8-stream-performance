@@ -3,7 +3,6 @@ package io.nattrass;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +33,7 @@ public class Max {
 
   @Setup
   public static void init () {
-    randomIntegers = arrayOfRandomIntegers();
+    randomIntegers = generateArrayOfRandomPositiveIntegers();
     randomIntegerList = new ArrayList<>(Arrays.asList(randomIntegers));
     randoms = Arrays.stream(randomIntegers).mapToInt(Integer::intValue).toArray();
   }
@@ -43,7 +42,7 @@ public class Max {
 
   @Benchmark
   public int intArray_for () {
-    int max = Integer.MIN_VALUE;
+    int max = 0;
     for (int i = 0; i < randoms.length; i++) {
       max = Math.max(max, randoms[i]);
     }
@@ -53,7 +52,7 @@ public class Max {
 
   @Benchmark
   public int intArray_forEach () {
-    int max = Integer.MIN_VALUE;
+    int max = 0;
     for (int value : randoms) {
       max = Math.max(max, value);
     }
@@ -63,7 +62,7 @@ public class Max {
 
   @Benchmark
   public int intArray_lambda () {
-    return Arrays.stream(randoms).reduce(Integer.MIN_VALUE, (a, b) -> Math.max(a, b));
+    return Arrays.stream(randoms).reduce(0, (a, b) -> Math.max(a, b));
   }
 
   @Benchmark
@@ -80,7 +79,7 @@ public class Max {
 
   @Benchmark
   public Integer integerArray_for () {
-    Integer max = Integer.MIN_VALUE;
+    Integer max = 0;
     for (int i = 0; i < randomIntegers.length; i++) {
       max = this.integerMax(max, randomIntegers[i]);
     }
@@ -90,7 +89,7 @@ public class Max {
 
   @Benchmark
   public Integer integerArray_forEach () {
-    Integer max = Integer.MIN_VALUE;
+    Integer max = 0;
     for (Integer value : randomIntegers) {
       max = this.integerMax(max, value);
     }
@@ -100,26 +99,24 @@ public class Max {
 
   @Benchmark
   public Integer integerArray_lambda () {
-    return Arrays.stream(randomIntegers).reduce(Integer.MIN_VALUE, (a, b) -> integerMax(a, b));
+    return Arrays.stream(randomIntegers).reduce(0, (a, b) -> integerMax(a, b));
   }
 
   @Benchmark
   public Integer integerArray_stream () {
-    Optional<Integer> integerOptional = Arrays.stream(randomIntegers).reduce(this::integerMax);
-    return integerOptional.get();
+    return Arrays.stream(randomIntegers).reduce(0, this::integerMax);
   }
 
   @Benchmark
   public Integer integerArray_parallelStream () {
-    Optional<Integer> integerOptional =  Arrays.stream(randomIntegers).parallel().reduce(this::integerMax);
-    return integerOptional.get();
+    return Arrays.stream(randomIntegers).parallel().reduce(0, this::integerMax);
   }
 
   // List<Integer>
 
   @Benchmark
   public Integer list_forEach () {
-    Integer max = Integer.MIN_VALUE;
+    Integer max = 0;
     for (Integer value : randomIntegerList) {
       max = integerMax(max, value);
     }
@@ -129,27 +126,28 @@ public class Max {
 
   @Benchmark
   public Integer list_lambda () {
-    return randomIntegerList.stream().reduce(Integer.MIN_VALUE, (a, b) -> integerMax(a, b)); // avoid unboxing
+    return randomIntegerList.stream().reduce(0, (a, b) -> integerMax(a, b)); // avoid unboxing
   }
 
   @Benchmark
   public Integer list_stream () {
-    Optional<Integer> integerOptional = randomIntegerList.stream().reduce(this::integerMax);
-    return integerOptional.get();
+    return randomIntegerList.stream().reduce(0, this::integerMax);
   }
 
   @Benchmark
   public Integer list_parallelStream () {
-    Optional<Integer> integerOptional =  randomIntegerList.stream().parallel().reduce(this::integerMax);
-    return integerOptional.get();
+    return randomIntegerList.stream().parallel().reduce(0, this::integerMax);
   }
 
-  private static Integer[] arrayOfRandomIntegers () {
+  private static Integer[] generateArrayOfRandomPositiveIntegers () {
+    int min = 0;
+    int max = Integer.MAX_VALUE;
+
     Random random = new Random();
     Integer[] array = new Integer[NUMBER_OF_ELEMENTS];
 
     for (int i = 0; i < NUMBER_OF_ELEMENTS; i++) {
-      array[i] = random.nextInt();
+      array[i] = random.nextInt((max - min) + 1) + min;
     }
 
     return array;
