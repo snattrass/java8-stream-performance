@@ -24,51 +24,39 @@ import org.openjdk.jmh.infra.Blackhole;
 @State(Scope.Thread)
 public class Control {
 
-    private static final int NUMBER_OF_ELEMENTS = 500_000;
-
-    private static int[] intArray;
+    private static int[] randoms;
 
     @Setup
     public static void init() {
-      intArray = initializeArrayOfRandomInts();
+      randoms = RandomNumbers.INSTANCE.getIntArray();
     }
 
     @Benchmark
     public void array_for(Blackhole hole) {
-      for (int i = 0; i < intArray.length; i++) {
-        hole.consume(intArray[i]);
+      for (int i = 0; i < randoms.length; i++) {
+        hole.consume(randoms[i]);
       }
     }
 
     @Benchmark
     public void array_forEach(Blackhole hole) {
-      for (int intValue : intArray) {
+      for (int intValue : randoms) {
         hole.consume(intValue);
       }
     }
     @Benchmark
     public void array_lambda (Blackhole hole) {
-        Arrays.stream(intArray).forEach(value -> hole.consume(value));
+        Arrays.stream(randoms).forEach(value -> hole.consume(value));
     }
 
     @Benchmark
     public void array_stream (Blackhole hole) {
-        Arrays.stream(intArray).forEach(hole::consume);
+        Arrays.stream(randoms).forEach(hole::consume);
     }
 
     @Benchmark
     public void array_parallelStream (Blackhole hole) {
-        Arrays.stream(intArray).parallel().forEach(hole::consume);
+        Arrays.stream(randoms).parallel().forEach(hole::consume);
     }
 
-    private static int[] initializeArrayOfRandomInts() {
-        Random random = new Random();
-        int[] array = new int[NUMBER_OF_ELEMENTS];
-
-        for (int i = 0; i < NUMBER_OF_ELEMENTS; i++) {
-            array[i] = random.nextInt();
-        }
-
-        return array;
-    }
 }
